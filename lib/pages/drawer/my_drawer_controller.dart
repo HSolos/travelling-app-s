@@ -1,12 +1,20 @@
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
-import 'package:get/get.dart';
 
-class MyDrawerController extends GetxController {
+class MyDrawerController {
+  @override
+  // ignore: override_on_non_overriding_member
   final zoomDrawerController = ZoomDrawerController();
+  //
+  void toggleDrawer(context) {
+    if (ZoomDrawer.of(context)!.isOpen()) {
+      print("Toggle drawer ");
 
-  void toggleDrawer() {
-    print("Toggle drawer");
-    zoomDrawerController.toggle?.call();
-    update();
+      ZoomDrawer.of(context)!.close();
+    } else {
+      print("Toggle drawer cerrar");
+
+      ZoomDrawer.of(context)!.open();
+    }
+    //zoomDrawerController.toggle?.call();
   }
 }

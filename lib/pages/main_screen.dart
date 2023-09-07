@@ -1,20 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:get/get_state_manager/src/simple/get_view.dart';
+import 'package:provider/provider.dart';
 import 'package:travellingg_viajes/models/country.dart';
 import 'package:travellingg_viajes/pages/drawer/my_drawer_controller.dart';
+import 'package:travellingg_viajes/providers/price._provider.dart';
 import 'package:travellingg_viajes/widget/countries_card_widget.dart';
 import 'package:travellingg_viajes/widget/where_to_card_widget.dart';
 
-class MainScreen extends GetView<MyDrawerController> {
-  MainScreen({Key? key}) : super(key: key);
-  TextEditingController destinoController = TextEditingController(text: "");
-  TextEditingController desdeController = TextEditingController(text: "");
-  TextEditingController fechaController = TextEditingController(text: "");
+class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
 
+  @override
+  State<MainScreen> createState() => _MainScreen();
+}
+
+class _MainScreen extends State<MainScreen> {
+  TextEditingController destinoController = TextEditingController(text: "");
+  TextEditingController desdeController = TextEditingController(text: "Peru");
+  TextEditingController fechaController = TextEditingController(text: "");
   @override
   Widget build(BuildContext context) {
     //   TextEditingController searchController = TextEditingController();
+    String precio = context.watch<PriceProvider>().getPrice;
 
     return Scaffold(
       body: Padding(
@@ -25,7 +31,9 @@ class MainScreen extends GetView<MyDrawerController> {
               child: Row(
                 children: [
                   IconButton(
-                    onPressed: controller.toggleDrawer,
+                    onPressed: () {
+                      MyDrawerController().toggleDrawer(context);
+                    },
                     icon: const Icon(
                       Icons.menu,
                       size: 35,
@@ -35,7 +43,7 @@ class MainScreen extends GetView<MyDrawerController> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(left: 10.0, right: 10, top: 5),
+              padding: const EdgeInsets.only(left: 10.0, right: 10, top: 5),
               child: Column(
                 children: [
                   const Row(
@@ -56,6 +64,7 @@ class MainScreen extends GetView<MyDrawerController> {
                         destinoController: destinoController,
                         desdeController: desdeController,
                         fechaController: fechaController,
+                        precio: precio,
                       ),
                     ],
                   ),
@@ -73,7 +82,8 @@ class MainScreen extends GetView<MyDrawerController> {
                   return InkWell(
                     onTap: () {
                       destinoController.text = countries[index].name;
-                      //print(destino.text);
+                      Provider.of<PriceProvider>(context, listen: false)
+                          .setPrice(countries[index].price.toString());
                     },
                     child: CountriesCardWidget(
                       image: countries[index].image,

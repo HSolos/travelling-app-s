@@ -1,28 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:travellingg_viajes/pages/book_flight/book_flight_page.dart';
 import 'package:intl/intl.dart';
+import 'package:travellingg_viajes/pages/traveler_form/traveler_form_page.dart';
 
 // ignore: must_be_immutable
 class WhereToWidget extends StatefulWidget {
   TextEditingController destinoController;
   TextEditingController desdeController;
   TextEditingController fechaController;
+  String precio;
 
   WhereToWidget(
       {super.key,
       required this.destinoController,
       required this.desdeController,
-      required this.fechaController});
+      required this.fechaController,
+      required this.precio});
 
   @override
   State<WhereToWidget> createState() => _WhereToWidgetState();
 }
 
 class _WhereToWidgetState extends State<WhereToWidget> {
+  bool validate = false;
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     return Stack(
       children: [
         Card(
@@ -36,25 +37,29 @@ class _WhereToWidgetState extends State<WhereToWidget> {
               width: 340,
               height: 210,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   TextField(
+                    readOnly: true,
                     decoration: const InputDecoration(
-                      constraints: BoxConstraints(maxHeight: 55),
+                      enabled: true,
+                      constraints: BoxConstraints(maxHeight: 45),
                       icon: Icon(Icons.radio_button_checked),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(50))),
-                      labelText: 'De ...',
                     ),
-                    style: const TextStyle(),
                     controller: widget.desdeController,
                   ),
                   TextField(
+                    // ignore: prefer_const_constructors
+                    key: Key("destino"),
                     controller: widget.destinoController,
-                    decoration: const InputDecoration(
-                      constraints: BoxConstraints(maxHeight: 60),
-                      icon: Icon(Icons.location_on),
-                      border: OutlineInputBorder(
+                    decoration: InputDecoration(
+                      constraints: const BoxConstraints(maxHeight: 84),
+                      errorText: validate ? "Seleccione un destino" : null,
+                      helperText: "Toca en un pais de destino",
+                      icon: const Icon(Icons.location_on),
+                      border: const OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(50))),
                       labelText: 'Destino ...',
                     ),
@@ -62,25 +67,10 @@ class _WhereToWidgetState extends State<WhereToWidget> {
                   TextField(
                       readOnly: true,
                       onTap: () async {
-                        DateTime? pickedDate = await showDatePicker(
-                            context: context,
-                            initialDate: DateTime.now(),
-                            firstDate: DateTime(
-                                2000), //DateTime.now() - not to allow to choose before today.
-                            lastDate: DateTime(2101));
-                        if (pickedDate != null) {
-                          print(
-                              pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
-                          String formattedDate =
-                              DateFormat('yyyy-MM-dd').format(pickedDate);
-                          print(
-                              formattedDate); //formatted date output using intl package =>  2021-03-16
-
-                          widget.fechaController.text = formattedDate;
-                        }
+                        await getDate(context);
                       },
                       decoration: const InputDecoration(
-                        constraints: BoxConstraints(maxHeight: 55),
+                        constraints: BoxConstraints(maxHeight: 45),
                         icon: Icon(Icons.date_range),
                         border: OutlineInputBorder(
                             borderRadius:
@@ -99,12 +89,45 @@ class _WhereToWidgetState extends State<WhereToWidget> {
           child: FloatingActionButton(
             child: const Icon(Icons.airplanemode_active),
             onPressed: () {
-              //Navigator.push(context,MaterialPageRoute(builder: (context) => BookFlightPage()));
-              print(widget.fechaController.text);
+              if (widget.destinoController.text != "") {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const TravelerFormPage(),
+                        settings: RouteSettings(arguments: {
+                          "desde": widget.desdeController.text,
+                          "date": widget.fechaController.text,
+                          "destino": widget.destinoController.text,
+                          "precio": widget.precio,
+                          "hDia": "",
+                          "fDia": "",
+                        })));
+              } else {
+                setState(() {
+                  validate = true;
+                });
+              }
+              return;
             },
           ),
         )
       ],
     );
+  }
+
+  Future<void> getDate(BuildContext context) async {
+    DateTime? pickedDate = await showDatePicker(
+        context: context,
+        locale: const Locale("es", "ES"),
+        initialDate: DateTime.now(),
+        firstDate: DateTime(2000),
+        lastDate: DateTime(2040));
+    if (pickedDate != null) {
+      String formattedDate = DateFormat('dd-MM-yyyy').format(pickedDate);
+      debugPrint(formattedDate);
+      widget.fechaController.text = formattedDate;
+    } else {
+      debugPrint("Ninguna fecha seleccionada");
+    }
   }
 }
