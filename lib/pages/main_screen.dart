@@ -19,7 +19,6 @@ class _MainScreen extends State<MainScreen> {
   TextEditingController fechaController = TextEditingController(text: "");
   @override
   Widget build(BuildContext context) {
-    //   TextEditingController searchController = TextEditingController();
     String precio = context.watch<PriceProvider>().getPrice;
 
     return Scaffold(
@@ -72,7 +71,6 @@ class _MainScreen extends State<MainScreen> {
                 ],
               ),
             ),
-            //  CountriesCardWidget(),
             //
             Expanded(
               child: ListView.builder(
