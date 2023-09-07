@@ -1,3 +1,2 @@
 # travellingg_viajes
-
-A new Flutter project.
+Simple app
